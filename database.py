@@ -5,10 +5,7 @@ import os
 load_dotenv()
 
 def initialize_db(database:str):
-    try:
-        uri = os.getenv("MONGODB_URL")
-    except:
-        uri = "mongodb://localhost:27017/"
+    uri = "mongodb://localhost:27017/"
     client = MongoClient(uri, server_api=ServerApi('1'))
     return client[database]
 
