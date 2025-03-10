@@ -47,15 +47,12 @@ To test the API, follow the steps below:
 - ![Query](./images/query.png)
 - ![Response](./images/response.png)
 
-- **Test Picture 2** (another placeholder for API testing)
-- ![Database](./images/database.png)
-
 ---
 
 ## **Database**
 
 The application utilizes a database for storing and retrieving data. Here's the relevant structure or diagram:
-- **Picture 1** (Provide a database schema image or description of how your database is structured)
+- - ![Database](./images/database.png)
 
 ---
 
