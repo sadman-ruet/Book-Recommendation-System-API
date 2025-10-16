@@ -7,7 +7,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmb
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import CharacterTextSplitter
-from langchain_pinecone import PineconeVectorStore
+# from langchain_pinecone import PineconeVectorStore
+from langchain_pinecone.vectorstores import Pinecone, PineconeVectorStore
 
 
 # Set environment variables

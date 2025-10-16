@@ -6,3 +6,5 @@ pandas
 langchain-community
 fastapi
 sqlalchemy
+pymongo
+uvicorn
