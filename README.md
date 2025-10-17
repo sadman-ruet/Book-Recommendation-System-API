@@ -45,7 +45,7 @@ pip install -r requirements.txt
 To start the API server, use **Uvicorn** (an ASGI server for FastAPI) by running this command from the root directory:
 
 ```bash
-uvicorn main:app --reload
+uvicorn app:app --reload
 ```
 
 This will start the server in development mode with automatic reloads.
