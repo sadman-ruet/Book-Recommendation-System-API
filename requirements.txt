@@ -1,0 +1,10 @@
+tiktoken
+langchain_google_genai
+langchain
+langchain_pinecone
+pandas
+langchain-community
+fastapi
+sqlalchemy
+pymongo
+uvicorn

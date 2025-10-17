@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      padding: 30px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    input{
+      width: 96%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* optional spacing between buttons */
+    }
+
+    .button-container button {
+    flex: 1; /* buttons share equal width */
+    max-width: 48%; /* optional to avoid touching edges */
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    }
+
+    .button-container button:hover {
+    background-color: #45a049;
+    }
+    button-container {
+      display: flex;
+      justify-content: space-between;
+    }
+    .results {
+      margin-top: 20px;
+    }
+    .results ul {
+      list-style: none;
+      padding: 0;
+    }
+    .results li {
+      background: #eee;
+      padding: 8px;
+      margin-bottom: 5px;
+      border-radius: 4px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    hr {
+      margin: 40px 0;
+    }
+    /* Spinner */
+    .loader {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #4CAF50; /* Green */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 10px auto;
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Book Search -->
+  <h2>Book Search</h2>
+  <input type="text" id="searchKeyword" placeholder="Enter keyword" />
+  <select id="searchGenre">
+      <option value="">-- Select Genre --</option>
+  </select>
+  <div class="button-container">
+      <button onclick="searchBooks()">Search Books</button>
+      <button onclick="clearSearchResults()">Clear Search</button>
+  </div>
+  <div class="results" id="searchResults"></div>
+
+  <hr>
+
+  <!-- Book Recommendations -->
+  <h2>Book Recommendations</h2>
+  <input type="text" id="recKeyword" placeholder="Enter keyword for recommendation" />
+  <div class="button-container"> 
+      <button onclick="getRecommendations()">Get Recommendations</button>
+        <button onclick="clearRecResults()">Clear Recommendations</button>
+  </div>
+
+  <div class="results" id="recResults"></div>
+</div>
+
+<script>
+  const BASE_URL = 'https://sadman-hasib-book-recommendation-api.hf.space';
+
+
+  // Populate genres dynamically
+  const genres = ['Horror', 'Fantasy', 'Comic', 'Romance', 'Adventure', 'Mystery'];
+  const select = document.getElementById('searchGenre');
+  genres.forEach(genre => {
+      const option = document.createElement('option');
+      option.value = genre.toLowerCase();
+      option.textContent = genre;
+      select.appendChild(option);
+  });
+
+  // ---------------- Book Search ----------------
+  async function searchBooks() {
+    const keyword = document.getElementById('searchKeyword').value;
+    const genre = document.getElementById('searchGenre').value;
+    const body = { query: keyword, genre: genre };
+
+    try {
+      const response = await fetch(`${BASE_URL}/searchBook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      displaySearchResults(data.results);
+    } catch (err) {
+      console.error(err);
+      document.getElementById('searchResults').innerHTML = `<p style="color:red;">Error fetching books</p>`;
+    }
+  }
+
+  // -------------- Book Recommendations ---------------
+  async function getRecommendations() {
+    const keyword = document.getElementById('recKeyword').value;
+    const container = document.getElementById('recResults');
+
+    // Show spinner while waiting
+    container.innerHTML = `<div class="loader"></div>`;
+
+    const body = { query: keyword };
+
+    try {
+      const response = await fetch(`${BASE_URL}/recommendations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      displayRecResults(data.results);
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = `<p style="color:red;">Error fetching recommendations</p>`;
+    }
+}
+
+
+  // --------------- Display Search Results -----------------
+  function displaySearchResults(results) {
+    const container = document.getElementById('searchResults');
+    if (!results || results.length === 0) {
+      container.innerHTML = '<p>No results found</p>';
+      return;
+    }
+    const list = results.map(book => `<li>${book}</li>`).join('');
+    container.innerHTML = `<ul>${list}</ul>`;
+  }
+
+  // --------------- Display Recommendation Results -----------------
+  function displayRecResults(results) {
+    const container = document.getElementById('recResults');
+    if (!results || results.length === 0) {
+      container.innerHTML = '<p>No recommendations found</p>';
+      return;
+    }
+
+    let text = results;
+    if (typeof results !== 'string') text = JSON.stringify(results);
+
+    // Convert **bold** to <strong> and preserve newlines
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\n/g, '<br>');
+
+    container.innerHTML = `<div>${text}</div>`;
+  }
+
+  // --------------- Clear Functions -----------------
+  function clearSearchResults() {
+    document.getElementById('searchResults').innerHTML = '';
+    document.getElementById('searchKeyword').value = '';
+    document.getElementById('searchGenre').value = '';
+  }
+
+  function clearRecResults() {
+    document.getElementById('recResults').innerHTML = '';
+    document.getElementById('recKeyword').value = '';
+  }
+</script>
+</body>
+</html>
